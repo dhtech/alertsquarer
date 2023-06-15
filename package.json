@@ -16,9 +16,11 @@
     "rpi-led-matrix": "^1.14.0"
   },
   "devDependencies": {
+    "@tsconfig/node18": "^2.0.1",
     "@types/node": "^20.3.1",
     "rimraf": "^5.0.1",
     "ts-node": "^10.9.1",
+    "ts-standard": "^12.0.2",
     "typescript": "^5.1.3"
   }
 }

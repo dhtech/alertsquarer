@@ -1,6 +1,8 @@
 {
+  "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
     "outDir": "./build",
+    "esModuleInterop": true,
     "allowJs": false,
     "allowSyntheticDefaultImports": false,
     "alwaysStrict": true,
