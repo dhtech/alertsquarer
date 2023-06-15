@@ -1,0 +1,24 @@
+{
+  "name": "alertsquarer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "rimraf ./build; mkdir ./build && tsc && cp src/*.bdf ./build/",
+    "dev": "cd src; ts-node ./index.ts",
+    "start": "cd build; node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fastify": "^4.18.0",
+    "rpi-led-matrix": "^1.14.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.3.1",
+    "rimraf": "^5.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.3"
+  }
+}
