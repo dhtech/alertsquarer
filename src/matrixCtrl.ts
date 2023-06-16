@@ -6,13 +6,16 @@ import { getFonts, getMatrix, drawState } from './libs/matrix'
 import { teams, updateMs, P_API_TO_MATRIX } from './settings'
 import type { Team } from './types'
 
-interface Data {
+interface AlertData {
+  type: 'alerts'
   ts: number
   count: Record<Team, number>
-  heartbeat: boolean
+  heartbeatTimeout: boolean
+  heartbeatTS: number
 }
 
-let heartbeat = false
+let heartbeatTimeout = false
+let showHeart = false
 let alertCount: Record<Team, number> = { core: 0, access: 0, services: 0 }
 
 const runMatrix = async (): Promise<void> => {
@@ -34,15 +37,17 @@ const runMatrix = async (): Promise<void> => {
       const fifoRs = fs.createReadStream('', { fd })
 
       fifoRs.on('data', rawData => {
-        const apiData = JSON.parse(rawData.toString()) as Data
+        const apiData = JSON.parse(rawData.toString()) as AlertData
         const dataAge = new Date().getTime() - apiData.ts
         if (dataAge > 10000) {
           console.log(`Discarding data from server, too old ´(${dataAge})`)
           return
         }
+
         // Update state
-        heartbeat = apiData.heartbeat
-        alertCount = apiData.count
+        heartbeatTimeout = (apiData).heartbeatTimeout
+        alertCount = (apiData).count
+        showHeart = ((new Date().getTime() - apiData.heartbeatTS) < 1000)
       })
     })
 
@@ -63,9 +68,8 @@ const runMatrix = async (): Promise<void> => {
       // For each team, draw the state of that teams count of active alerts
       teams.forEach((team: Team, i: number) => {
         const state = alertCount[team] ?? 0
-        drawState(matrix, fonts, i, team.toUpperCase(), state, heartbeat, n)
+        drawState(matrix, fonts, i, team.toUpperCase(), state, heartbeatTimeout, showHeart, n)
       })
-
       matrix.sync() // Sync the matrix to the panels
       await wait(updateMs) // wait a while, this affects the blinking speed mostly
     }
