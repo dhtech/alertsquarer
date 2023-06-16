@@ -16,12 +16,15 @@ git clone https://github.com/dhtech/alertsquarer.git
 cd alertsquarer
 npm install
 
-# to run via ts-node
-npm run dev
+# to run via ts-node, start in sepatare terminal windows:
+npm run devapi
+npm run devmatrix
 
 # to build ts to js and run
 npm run build
-npm run start
+# and in separate terminal windows:
+npm run api
+npm run matrix
 ```
 
 ## More information
