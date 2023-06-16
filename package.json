@@ -1,15 +1,17 @@
 {
   "name": "alertsquarer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "build": "rimraf ./build; mkdir ./build && tsc && cp src/*.bdf ./build/",
-    "dev": "cd src; ts-node ./index.ts",
-    "start": "cd build; node index.js",
+    "devAPI": "cd src; ts-node ./apiServer.ts",
+    "devMatrix": "cd src; ts-node ./matrixCtrl.ts",
+    "startApi": "cd build; node apiServer.js",
+    "startMatrix": "cd build; node matrixCtrl.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "The Louie",
   "license": "ISC",
   "dependencies": {
     "fastify": "^4.18.0",
