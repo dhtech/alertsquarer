@@ -30,9 +30,8 @@ npm run matrix
 ### Blacklist kernel module
 The matrix driver doesn't work when the module `snd_bcm2835` is loaded so it needs to be blacklisted.
 
-/etc/modprobe.d/no_rpi_sound.conf
 ```
-blacklist snd_bcm2835
+echo "blacklist snd_bcm2835" > /etc/modprobe.d/no_rpi_sound.conf
 ```
 
 ### systemctl
@@ -40,8 +39,9 @@ Autostart the services
 
 #### Start the API
 ```
+echo <<<OEF >/etc/systemd/system/alertsquarer-api.service
 [Unit]
-Description=alertsquarer
+Description=alertsquarer-api
 After=network.target
 
 [Service]
@@ -55,12 +55,18 @@ WorkingDirectory=/root/AlertSquarer
 
 [Install]
 WantedBy=multi-user.target
+EOF
+systemctl daemon-reload
+systemctl enable alertsquarer-api.service
+systemctl start alertsquarer-api.service
+
 ```
 
 #### Start the Matrix controller
 ```
+echo <<<OEF >/etc/systemd/system/alertsquarer-matrix.service
 [Unit]
-Description=alertsquarer
+Description=alertsquarer-matrix
 After=network.target
 
 [Service]
@@ -70,10 +76,14 @@ User=root
 Group=root
 Environment=PATH=/usr/bin:/usr/local/bin
 Environment=NODE_ENV=production
-WorkingDirectory=/root/AlertSquarer
+WorkingDirectory=/opt/alertsquarer
 
 [Install]
 WantedBy=multi-user.target
+EOF
+systemctl daemon-reload
+systemctl enable alertsquarer-matrix.service
+systemctl start alertsquarer-matrix.service
 ```
 
 ## More information
