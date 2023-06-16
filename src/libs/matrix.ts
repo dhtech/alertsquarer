@@ -1,7 +1,14 @@
 import { Font, FontInstance, LedMatrix, LedMatrixInstance } from 'rpi-led-matrix'
 
+const heartBitmap = [
+  [0, 1, 0, 1, 0],
+  [1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1],
+  [0, 1, 1, 1, 0],
+  [0, 0, 1, 0, 0]
+]
 // Update the LED-panels
-export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontInstance>, panel: number, name: string, errCnt: number, heartbeat: boolean, n: number): void => {
+export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontInstance>, panel: number, name: string, errCnt: number, heartbeat: boolean, showHeart: boolean, n: number): void => {
   let bgColor = 0x000000
   let fgColor = 0xffffff
 
@@ -61,6 +68,18 @@ export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontI
   matrix.font(fonts.largeFont)
   matrix.fgColor(fgColor)
   matrix.drawText(effErrCnt, xoffsetErr, 4)
+
+  // Show heart on first panel
+  if (showHeart && panel === 0) {
+    matrix.fgColor((n % 2 === 0) ? 0x0000ff : 0xffffff)
+    for (let y = 0; y < 5; y++) {
+      for (let x = 0; x < 5; x++) {
+        if (heartBitmap[y][x] === 1) {
+          matrix.setPixel(x, y)
+        }
+      }
+    }
+  }
 }
 
 export const getMatrix = (): LedMatrixInstance => new LedMatrix(
