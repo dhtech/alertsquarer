@@ -27,6 +27,55 @@ npm run api
 npm run matrix
 ```
 
+### Blacklist kernel module
+The matrix driver doesn't work when the module `snd_bcm2835` is loaded so it needs to be blacklisted.
+
+/etc/modprobe.d/no_rpi_sound.conf
+```
+blacklist snd_bcm2835
+```
+
+### systemctl
+Autostart the services
+
+#### Start the API
+```
+[Unit]
+Description=alertsquarer
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/npm run api
+Restart=always
+User=root
+Group=root
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=NODE_ENV=production
+WorkingDirectory=/root/AlertSquarer
+
+[Install]
+WantedBy=multi-user.target
+```
+
+#### Start the Matrix controller
+```
+[Unit]
+Description=alertsquarer
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/npm run matrix
+Restart=always
+User=root
+Group=root
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=NODE_ENV=production
+WorkingDirectory=/root/AlertSquarer
+
+[Install]
+WantedBy=multi-user.target
+```
+
 ## More information
 The LED-library:
 https://github.com/hzeller/rpi-rgb-led-matrix/tree/master
