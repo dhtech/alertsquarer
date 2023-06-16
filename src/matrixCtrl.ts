@@ -19,9 +19,11 @@ const runMatrix = async (): Promise<void> => {
   console.log('Starting matrix...')
   try {
     // Setup FIFO
-    if (fs.existsSync(P_API_TO_MATRIX)) {
-      console.log('Deleting', P_API_TO_MATRIX)
-      fs.unlinkSync(P_API_TO_MATRIX)
+    if (!fs.existsSync(P_API_TO_MATRIX)) {
+      //console.log('Deleting', P_API_TO_MATRIX)
+      //fs.unlinkSync(P_API_TO_MATRIX)
+      console.log(`Please create fifo, mkfifo ${P_API_TO_MATRIX} -m777`)
+      return
     }
     const fifoAPI = spawn('mkfifo', [P_API_TO_MATRIX]) // Create named pipe
 
