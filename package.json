@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "build": "rimraf ./build; mkdir ./build && tsc && cp src/*.bdf ./build/",
-    "devAPI": "cd src; ts-node ./apiServer.ts",
-    "devMatrix": "cd src; ts-node ./matrixCtrl.ts",
-    "startApi": "cd build; node apiServer.js",
-    "startMatrix": "cd build; node matrixCtrl.js",
+    "devapi": "cd src; ts-node ./apiServer.ts",
+    "devmatrix": "cd src; ts-node ./matrixCtrl.ts",
+    "api": "cd build; node apiServer.js",
+    "matrix": "cd build; node matrixCtrl.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "The Louie",
