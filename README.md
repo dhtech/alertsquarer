@@ -39,7 +39,7 @@ Autostart the services
 
 #### Start the API
 ```
-echo <<<EOF >/etc/systemd/system/alertsquarer-api.service
+echo <<EOF >/etc/systemd/system/alertsquarer-api.service
 [Unit]
 Description=alertsquarer-api
 After=network.target
@@ -64,7 +64,7 @@ systemctl start alertsquarer-api.service
 
 #### Start the Matrix controller
 ```
-echo <<<EOF >/etc/systemd/system/alertsquarer-matrix.service
+echo <<EOF >/etc/systemd/system/alertsquarer-matrix.service
 [Unit]
 Description=alertsquarer-matrix
 After=network.target
