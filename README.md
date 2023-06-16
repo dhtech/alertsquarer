@@ -51,7 +51,7 @@ User=root
 Group=root
 Environment=PATH=/usr/bin:/usr/local/bin
 Environment=NODE_ENV=production
-WorkingDirectory=/root/AlertSquarer
+WorkingDirectory=/opt/alertsquarer
 
 [Install]
 WantedBy=multi-user.target
