@@ -8,7 +8,7 @@ const heartBitmap = [
   [0, 0, 1, 0, 0]
 ]
 // Update the LED-panels
-export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontInstance>, panel: number, name: string, errCnt: number, heartbeat: boolean, showHeart: boolean, n: number): void => {
+export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontInstance>, panel: number, name: string, errCnt: number, heartbeatTimeout: boolean, showHeart: boolean, n: number): void => {
   let bgColor = 0x000000
   let fgColor = 0xffffff
 
@@ -47,7 +47,7 @@ export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontI
   matrix.font(fonts.smallFont)
   const xoffsetName = (16 - ((name.length * 4) / 2)) + (panel * 32)
 
-  if (!heartbeat) { // No heartbeat
+  if (heartbeatTimeout) { // No heartbeat
     const hbFgColor = (n % 2 === 0) ? 0xffffff : 0x000000
     const hbBgColor = (n % 2 === 0) ? 0xaa0000 : 0xffff00
 
