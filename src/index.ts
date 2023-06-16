@@ -6,9 +6,10 @@ import fastify from 'fastify'
 
 const wait = async (ms: number): Promise<void> => await new Promise((resolve: () => void) => setTimeout(resolve, ms))
 
-const defaultTTL = 600000
-const heartbeatTTL = 1100
+const defaultTTL = 600000 // 10 minutes in milliseconds
+const heartbeatTTL = defaultTTL // In original python code this was 11 sec
 const teams = ['core', 'access', 'services']
+
 let heartbeatTS = 0
 
 const server = fastify({})
