@@ -17,16 +17,23 @@ export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontI
   } else if (errCnt <= 5) {
     bgColor = 0xff0000
     fgColor = 0x000000
-  } else if (errCnt > 5) {
+  } else if (errCnt <= 99) {
     if (n % 2 === 0) {
       fgColor = 0xff0000
     } else {
       fgColor = 0x000000
       bgColor = 0xff0000
     }
+  } else {
+    fgColor = 0x000000
+    if (n % 2 === 0) {
+      bgColor = 0x0000ff
+    } else {
+      bgColor = 0xff0000
+    }
   }
 
-  const effErrCnt = (errCnt < 10) ? `${errCnt}` : '>9'
+  const effErrCnt = (errCnt <= 99) ? `${errCnt}` : ':('
   const xoffsetErr = (effErrCnt.length === 1 ? 10 : 5) + (panel * 32)
 
   // Team Text
