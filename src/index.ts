@@ -1,33 +1,18 @@
-import {
-  Font,
-  LedMatrix
-} from 'rpi-led-matrix'
+import { Font, LedMatrix } from 'rpi-led-matrix'
 import fastify from 'fastify'
-
-const wait = async (ms: number): Promise<void> => await new Promise((resolve: () => void) => setTimeout(resolve, ms))
+import type { IQueryString, IBody, Alert } from './types'
 
 const defaultTTL = 600000 // 10 minutes in milliseconds
 const heartbeatTTL = defaultTTL // In original python code this was 11 sec
-const teams = ['core', 'access', 'services']
+const teams = ['core', 'access', 'services'] // available teams to keep track of, needs to have one panel each
 
 let heartbeatTS = 0
 
 const server = fastify({})
 
-interface IQueryString {
-  team: string
-}
-interface IBody {
-  groupKey: string
-  status: string
-}
-interface Alert {
-  team: string
-  groupKey: string
-  status: string
-  timestamp: number
-}
+const wait = async (ms: number): Promise<void> => await new Promise((resolve: () => void) => setTimeout(resolve, ms))
 
+// Keeps track of a list of alerts
 let alerts: Record<string, Alert> = {}
 
 server.post('/api/v1/alerts', async (request, reply) => {
@@ -47,16 +32,18 @@ server.post('/api/v1/alerts', async (request, reply) => {
   return { result: 'success', message: 'Sorry to hear, but noted' }
 })
 
+// Remove alerts that are too old
 const pruneAlerts = (): void => {
   const startCount = Object.keys(alerts).length
-
   const now = new Date().getTime()
 
   alerts = Object.keys(alerts).reduce((result: Record<string, Alert>, key: string) => {
     const alert = alerts[key]
     if (now - alert.timestamp < defaultTTL) {
+      // keep the alert if it's younger than defaultTTL
       result[`${alert.team}:${alert.groupKey}`] = alert
     } else {
+      //
       console.log('removing', (now - alert.timestamp), alert)
     }
 
@@ -66,23 +53,20 @@ const pruneAlerts = (): void => {
 
   console.log(`Pruned ${startCount - endCount} alerts.`)
 }
-setInterval(pruneAlerts, 3000)
 
-const cb = (err: Error | null, addr: string): boolean => {
+const serverCallback = (err: Error | null, addr: string): void => {
   if (err !== null) {
     console.error(err)
-    return false
+  } else {
+    console.log(`API-server listening on ${addr}`)
   }
-  console.log(`Listening on ${addr}`)
-  return true
 }
 
+// Create a dict with each team being the key and the value the number of active alerts.
 const countAlerts = (alerts: Record<string, Alert>): Record<string, number> => {
   const count = Object.keys(alerts).reduce((result: Record<string, number>, key: string) => {
     const alert = alerts[key]
-
     result[alert.team] = (result[alert.team] ?? 0) + 1
-
     return result
   }, {})
   console.log(count)
@@ -90,16 +74,28 @@ const countAlerts = (alerts: Record<string, Alert>): Record<string, number> => {
 }
 
 void (async () => {
-  await server.listen({ host: '0.0.0.0', port: 6379 }, cb)
+  console.log('Starting...')
+
+  // start webserver
+  await server.listen({ host: '0.0.0.0', port: 6379 }, serverCallback)
+
+  // start pruning evert 3s
+  console.log('Pruning started...')
+  setInterval(pruneAlerts, 3000)
+
   try {
+    // Initialize LED-matrix
     const matrix = new LedMatrix(
       { ...LedMatrix.defaultMatrixOptions(), chainLength: 3 },
       LedMatrix.defaultRuntimeOptions()
     )
 
+    // Load fonts, one small for the team name and one large for the number
+    // of active alerts
     const smallFont = new Font('tom-thumb', './tom-thumb.bdf')
     const largeFont = new Font('10x20', './10x20.bdf')
 
+    // Update the LED-panels
     const drawState = (panel: number, name: string, errCnt: number, heartbeatAge: number, n: number): void => {
       let bgColor = 0x000000
       let fgColor = 0xffffff
@@ -155,24 +151,26 @@ void (async () => {
       matrix.drawText(effErrCnt, xoffsetErr, 4)
     }
 
-    let n = 0
-    // Update loop
+    let n = 0 // iterator so we can blink
+
+    // Main loop for updating panels
     while (true) {
       n += 1
-      matrix.clear()
+      matrix.clear() // blank the (virtual) matrix
 
-      const alertCount = countAlerts(alerts)
-      const heartbeatAge = new Date().getTime() - heartbeatTS
+      const alertCount = countAlerts(alerts) // Get the number of alerts per team
+      const heartbeatAge = new Date().getTime() - heartbeatTS // Get the age of the last heartbeat
+
+      // For each team, draw the state of that teams count of active alerts
       teams.forEach((team: string, i: number) => {
         const state = alertCount[team] ?? 0
         drawState(i, team.toUpperCase(), state, heartbeatAge, n)
       })
 
-      matrix.sync()
-      await wait(200)
+      matrix.sync() // Sync the matrix to the panels
+      await wait(200) // wait a while, this affects the blinking speed mostly
     }
   } catch (error) {
-    console.log('ERROR')
-    console.error(error)
+    console.error('ERROR:', error)
   }
 })()
