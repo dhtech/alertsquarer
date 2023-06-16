@@ -33,7 +33,7 @@ export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontI
     }
   }
 
-  const effErrCnt = (errCnt <= 99) ? `${errCnt}` : ':('
+  const effErrCnt = (errCnt <= 99) ? `${errCnt}` : ':(' // If we have 100 or more errors, just show a sad face
   const xoffsetErr = (effErrCnt.length === 1 ? 10 : 5) + (panel * 32)
 
   // Team Text
