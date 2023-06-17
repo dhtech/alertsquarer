@@ -8,13 +8,20 @@ const heartBitmap = [
   [0, 0, 1, 0, 0]
 ]
 
-const colorMap = {
+type Color = '0' | 'B' | 'W' | 'Y' | 'O' | 'D' | 'L' | 'R'
+
+const colorMap: Record<Color, number> = {
   0: -1,
   Y: 0xffff00,
   B: 0x000000,
-  W: 0xffffff
+  W: 0xffffff,
+  O: 0xfe7d3e,
+  D: 0x4c71a2,
+  L: 0x79afd9,
+  R: 0xbf2f36
 }
-const smileyBitmap: Array<Array<'0' | 'B' | 'W' | 'Y'>> = [
+
+const smileyBitmap: Color[][] = [
   ['0', '0', '0', '0', '0', 'B', 'B', 'B', 'B', 'B', '0', '0', '0', '0', '0'],
   ['0', '0', '0', 'B', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'B', '0', '0', '0'],
   ['0', '0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', '0', '0'],
@@ -31,6 +38,28 @@ const smileyBitmap: Array<Array<'0' | 'B' | 'W' | 'Y'>> = [
   ['0', '0', '0', 'B', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'B', '0', '0', '0'],
   ['0', '0', '0', '0', '0', 'B', 'B', 'B', 'B', 'B', '0', '0', '0', '0', '0']
 ]
+
+const screamBitmap: Color[][] = [
+  ['0', '0', '0', '0', '0', '0', 'D', 'D', 'D', 'D', 'D', 'D', '0', '0', '0', '0', '0', '0'],
+  ['0', '0', '0', '0', 'D', 'D', 'L', 'L', 'L', 'L', 'L', 'L', 'D', 'D', '0', '0', '0', '0'],
+  ['0', '0', '0', 'D', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'D', '0', '0', '0'],
+  ['0', '0', 'D', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'D', '0', '0'],
+  ['0', 'D', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'D', '0'],
+  ['0', 'D', 'L', 'L', 'B', 'B', 'B', 'L', 'L', 'L', 'L', 'B', 'B', 'B', 'L', 'L', 'D', '0'],
+  ['O', 'L', 'L', 'B', 'W', 'W', 'W', 'B', 'Y', 'Y', 'B', 'W', 'W', 'W', 'B', 'L', 'L', 'O'],
+  ['O', 'Y', 'B', 'W', 'W', 'W', 'W', 'B', 'Y', 'Y', 'B', 'W', 'W', 'W', 'W', 'B', 'Y', 'O'],
+  ['O', 'Y', 'B', 'W', 'W', 'W', 'B', 'Y', 'Y', 'Y', 'Y', 'B', 'W', 'W', 'W', 'B', 'Y', 'O'],
+  ['O', 'Y', 'B', 'W', 'W', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'W', 'W', 'B', 'Y', 'O'],
+  ['O', 'Y', 'Y', 'B', 'B', 'Y', 'Y', 'Y', 'B', 'B', 'Y', 'Y', 'Y', 'B', 'B', 'Y', 'Y', 'O'],
+  ['O', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'R', 'R', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'O'],
+  ['0', 'O', 'O', 'O', 'Y', 'Y', 'Y', 'B', 'R', 'R', 'B', 'Y', 'Y', 'Y', 'O', 'O', 'O', '0'],
+  ['0', 'O', 'Y', 'Y', 'O', 'Y', 'Y', 'B', 'R', 'R', 'B', 'Y', 'Y', 'O', 'Y', 'Y', 'O', '0'],
+  ['0', 'O', 'Y', 'Y', 'Y', 'O', 'Y', 'B', 'R', 'R', 'B', 'Y', 'O', 'Y', 'Y', 'Y', 'O', '0'],
+  ['0', '0', 'O', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'O', '0', '0'],
+  ['0', '0', '0', 'O', 'Y', 'Y', 'O', 'O', 'Y', 'Y', 'O', 'O', 'Y', 'Y', 'O', '0', '0', '0'],
+  ['0', '0', '0', 'O', 'Y', 'Y', 'O', '0', 'O', 'O', '0', 'O', 'Y', 'Y', 'O', '0', '0', '0']
+]
+
 // Update the LED-panels
 export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontInstance>, panel: number, name: string, errCnt: number, heartbeatTimeout: boolean, showHeart: boolean, n: number): void => {
   let bgColor = 0x000000
@@ -103,6 +132,16 @@ export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontI
     matrix.font(fonts.largeFont)
     matrix.fgColor(fgColor)
     matrix.drawText(effErrCnt, xoffsetErr, 4)
+
+    const bitmap = screamBitmap
+    for (let y = 0; y < bitmap.length; y++) {
+      for (let x = 0; x < bitmap[y].length; x++) {
+        if (bitmap[y][x] !== '0') {
+          matrix.fgColor(colorMap[bitmap[y][x]])
+          matrix.setPixel((panel * 32) + x + Math.floor(bitmap[y].length / 2), y + Math.floor(bitmap.length / 2)) // the '8' offset should be dynamic based on the bitmap
+        }
+      }
+    }
   }
 
   // Show heart on first panel
@@ -111,7 +150,7 @@ export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontI
     for (let y = 0; y < 5; y++) {
       for (let x = 0; x < 5; x++) {
         if (heartBitmap[y][x] === 1) {
-          matrix.setPixel(x, y)
+          matrix.setPixel(x + 1, y + 1)
         }
       }
     }
