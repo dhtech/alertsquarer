@@ -94,7 +94,7 @@ export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontI
       for (let x = 0; x < smileyBitmap[y].length; x++) {
         if (smileyBitmap[y][x] !== '0') {
           matrix.fgColor(colorMap[smileyBitmap[y][x]])
-          matrix.setPixel((panel * 32) + x + 7, y + 7)
+          matrix.setPixel((panel * 32) + x + 8, y + 6) // the '8' offset should be dynamic based on the bitmap
         }
       }
     }
