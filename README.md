@@ -7,8 +7,6 @@ An visual experience for rendering prometheus alerts
 * 32x32 RGB-LED panels, one per team
 * 5V 5A powersupply
 
-**Disable sound on the pi** (*rmmod snd_bcm2835*)
-
 ## Install and run
 ```
 cd /opt
@@ -28,7 +26,7 @@ npm run matrix
 ```
 
 ### Blacklist kernel module
-The matrix driver doesn't work when the module `snd_bcm2835` is loaded so it needs to be blacklisted.
+The matrix driver doesn't work *at all* when the module `snd_bcm2835` is loaded so it needs to be blacklisted.
 
 ```
 echo "blacklist snd_bcm2835" > /etc/modprobe.d/no_rpi_sound.conf
