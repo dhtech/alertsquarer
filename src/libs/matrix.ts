@@ -127,21 +127,21 @@ export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontI
         }
       }
     }
-  } else {
-    // Count text
-    matrix.font(fonts.largeFont)
-    matrix.fgColor(fgColor)
-    matrix.drawText(effErrCnt, xoffsetErr, 4)
-
+  } else if (errCnt > 5 && showHeart) {
     const bitmap = screamBitmap
     for (let y = 0; y < bitmap.length; y++) {
       for (let x = 0; x < bitmap[y].length; x++) {
         if (bitmap[y][x] !== '0') {
           matrix.fgColor(colorMap[bitmap[y][x]])
-          matrix.setPixel((panel * 32) + x + Math.floor(bitmap[y].length / 2), y + Math.floor(bitmap.length / 2)) // the '8' offset should be dynamic based on the bitmap
+          matrix.setPixel((panel * 32) + x + Math.floor(bitmap[y].length / 2) - 2, y + Math.floor(bitmap.length / 2) - 4) // the '8' offset should be dynamic based on the bitmap
         }
       }
     }
+  } else {
+    // Count text
+    matrix.font(fonts.largeFont)
+    matrix.fgColor(fgColor)
+    matrix.drawText(effErrCnt, xoffsetErr, 4)
   }
 
   // Show heart on first panel
