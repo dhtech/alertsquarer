@@ -7,6 +7,30 @@ const heartBitmap = [
   [0, 1, 1, 1, 0],
   [0, 0, 1, 0, 0]
 ]
+
+const colorMap = {
+  0: -1,
+  Y: 0xffff00,
+  B: 0x000000,
+  W: 0xffffff
+}
+const smileyBitmap: Array<Array<'0' | 'B' | 'W' | 'Y'>> = [
+  ['0', '0', '0', '0', '0', 'B', 'B', 'B', 'B', 'B', '0', '0', '0', '0', '0'],
+  ['0', '0', '0', 'B', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'B', '0', '0', '0'],
+  ['0', '0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', '0', '0'],
+  ['0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', '0'],
+  ['0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', '0'],
+  ['B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B'],
+  ['B', 'Y', 'B', 'W', 'W', 'B', 'B', 'B', 'B', 'W', 'W', 'B', 'B', 'Y', 'B'],
+  ['B', 'Y', 'B', 'W', 'B', 'B', 'B', 'Y', 'B', 'W', 'B', 'B', 'B', 'Y', 'B'],
+  ['B', 'Y', 'Y', 'B', 'B', 'B', 'Y', 'Y', 'Y', 'B', 'B', 'B', 'Y', 'Y', 'B'],
+  ['B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B'],
+  ['0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'Y', 'Y', 'B', '0'],
+  ['0', 'B', 'Y', 'Y', 'Y', 'B', 'B', 'B', 'B', 'B', 'Y', 'Y', 'Y', 'B', '0'],
+  ['0', '0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', '0', '0'],
+  ['0', '0', '0', 'B', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'B', '0', '0', '0'],
+  ['0', '0', '0', '0', '0', 'B', 'B', 'B', 'B', 'B', '0', '0', '0', '0', '0']
+]
 // Update the LED-panels
 export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontInstance>, panel: number, name: string, errCnt: number, heartbeatTimeout: boolean, showHeart: boolean, n: number): void => {
   let bgColor = 0x000000
@@ -64,10 +88,22 @@ export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontI
   matrix.fgColor(bgColor)
   matrix.fill(0 + (panel * 32), 0, 32 + (panel * 32), 24)
 
-  // Count text
-  matrix.font(fonts.largeFont)
-  matrix.fgColor(fgColor)
-  matrix.drawText(effErrCnt, xoffsetErr, 4)
+  if (errCnt === 0) {
+    // Smiley
+    for (let y = 0; y < smileyBitmap.length; y++) {
+      for (let x = 0; x < smileyBitmap[y].length; x++) {
+        if (smileyBitmap[y][x] !== '0') {
+          matrix.fgColor(colorMap[smileyBitmap[y][x]])
+          matrix.setPixel((panel * 32) + x + 7, y + 7)
+        }
+      }
+    }
+  } else {
+    // Count text
+    matrix.font(fonts.largeFont)
+    matrix.fgColor(fgColor)
+    matrix.drawText(effErrCnt, xoffsetErr, 4)
+  }
 
   // Show heart on first panel
   if (showHeart && panel === 0) {
