@@ -84,6 +84,22 @@ systemctl enable alertsquarer-matrix.service
 systemctl start alertsquarer-matrix.service
 ```
 
+## Troubleshooting
+### If the matrix-controller complains about bad JSON
+Then there is multiple lines in the FIFO, we should fix that.
+* stop both services
+* remove the FIFO
+* start the matrix controller first!
+* start the api server.
+
+### If the matrix-controller just restarts too fast
+You might have forgotten to disable snd_bcm2835, see above.
+
+### If both servers are running but no updates on the matrix
+If the FIFO was recreated between that the API-server was started and
+the matrix controller started they might be trying to communicate
+on different inodes. Follow the steps for bad JSON above.
+
 ## More information
 The LED-library:
 https://github.com/hzeller/rpi-rgb-led-matrix/tree/master
