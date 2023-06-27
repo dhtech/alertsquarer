@@ -40,17 +40,21 @@ const runMatrix = async (): Promise<void> => {
       const fifoRs = fs.createReadStream('', { fd })
 
       fifoRs.on('data', rawData => {
-        const apiData = JSON.parse(rawData.toString()) as AlertData
-        const dataAge = new Date().getTime() - apiData.ts
-        if (dataAge > 10000) {
-          console.log(`Discarding data from server, too old ´(${dataAge})`)
-          return
-        }
+        try {
+          const apiData = JSON.parse(rawData.toString()) as AlertData
+          const dataAge = new Date().getTime() - apiData.ts
+          if (dataAge > 10000) {
+            console.log(`Discarding data from server, too old ´(${dataAge})`)
+            return
+          }
 
-        // Update state
-        heartbeatTimeout = (apiData).heartbeatTimeout
-        alertCount = (apiData).count
-        showHeart = ((new Date().getTime() - apiData.heartbeatTS) < 1000)
+          // Update state
+          heartbeatTimeout = (apiData).heartbeatTimeout
+          alertCount = (apiData).count
+          showHeart = ((new Date().getTime() - apiData.heartbeatTS) < 1000)
+        } catch {
+          console.log('Exception when getting data')
+        }
       })
     })
 
