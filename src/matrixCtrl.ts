@@ -69,9 +69,9 @@ const runMatrix = async (): Promise<void> => {
       matrix.clear() // blank the (virtual) matrix
 
       // For each team, draw the state of that teams count of active alerts
-      teams.forEach((team: Team, i: number) => {
-        const state = alertCount[team] ?? 0
-        drawState(matrix, fonts, i, team.toUpperCase(), state, heartbeatTimeout, showHeart, n)
+      teams.forEach((name: Team, panel: number) => {
+        const errCnt = alertCount[name] ?? 0
+        drawState({ matrix, fonts, panel, name, errCnt, heartbeatTimeout, showHeart, n })
       })
       matrix.sync() // Sync the matrix to the panels
       await wait(updateMs) // wait a while, this affects the blinking speed mostly

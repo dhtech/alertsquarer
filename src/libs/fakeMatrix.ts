@@ -1,18 +1,22 @@
+import type { drawStateProps } from '../types'
 type FontInstance = Record<string, string>
+
 interface LedMatrixInstance {
   clear: () => void
   sync: () => void
+  matrix: number[]
 }
 
 // Update the LED-panels
-export const drawState = (_matrix: LedMatrixInstance, _fonts: Record<string, string>, panel: number, name: string, errCnt: number, heartbeat: boolean, _n: number): void => {
+export const drawState = ({ panel, name, errCnt, heartbeatTimeout }: drawStateProps): void => {
   const effErrCnt = (errCnt < 10) ? `${errCnt}` : '>9'
-  console.log('MATRIX:', { heartbeat, panel, name, effErrCnt })
+  console.log('MATRIX:', { heartbeatTimeout, panel, name, effErrCnt })
 }
 
 export const getMatrix = (): LedMatrixInstance => ({
   clear: () => undefined,
-  sync: () => undefined
+  sync: () => undefined,
+  matrix: []
 })
 
 export const getFonts = (): FontInstance => ({

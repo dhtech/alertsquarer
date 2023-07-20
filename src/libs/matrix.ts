@@ -1,4 +1,5 @@
 import { Font, FontInstance, LedMatrix, LedMatrixInstance } from 'rpi-led-matrix'
+import type { drawStateProps } from '../types'
 
 const heartBitmap = [
   [0, 1, 0, 1, 0],
@@ -8,60 +9,49 @@ const heartBitmap = [
   [0, 0, 1, 0, 0]
 ]
 
-type Color = '0' | 'B' | 'W' | 'Y' | 'O' | 'D' | 'L' | 'R'
-
-const colorMap: Record<Color, number> = {
-  0: -1,
-  Y: 0xffff00,
-  B: 0x000000,
-  W: 0xffffff,
-  O: 0xfe7d3e,
-  D: 0x4c71a2,
-  L: 0x79afd9,
-  R: 0xbf2f36
-}
+type Color = number | undefined
 
 const smileyBitmap: Color[][] = [
-  ['0', '0', '0', '0', '0', 'B', 'B', 'B', 'B', 'B', '0', '0', '0', '0', '0'],
-  ['0', '0', '0', 'B', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'B', '0', '0', '0'],
-  ['0', '0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', '0', '0'],
-  ['0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', '0'],
-  ['0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', '0'],
-  ['B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B'],
-  ['B', 'Y', 'B', 'W', 'W', 'B', 'B', 'B', 'B', 'W', 'W', 'B', 'B', 'Y', 'B'],
-  ['B', 'Y', 'B', 'W', 'B', 'B', 'B', 'Y', 'B', 'W', 'B', 'B', 'B', 'Y', 'B'],
-  ['B', 'Y', 'Y', 'B', 'B', 'B', 'Y', 'Y', 'Y', 'B', 'B', 'B', 'Y', 'Y', 'B'],
-  ['B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B'],
-  ['0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'Y', 'Y', 'B', '0'],
-  ['0', 'B', 'Y', 'Y', 'Y', 'B', 'B', 'B', 'B', 'B', 'Y', 'Y', 'Y', 'B', '0'],
-  ['0', '0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', '0', '0'],
-  ['0', '0', '0', 'B', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'B', '0', '0', '0'],
-  ['0', '0', '0', '0', '0', 'B', 'B', 'B', 'B', 'B', '0', '0', '0', '0', '0']
+  [undefined, undefined, undefined, undefined, undefined, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, undefined, undefined, undefined, undefined, undefined],
+  [undefined, undefined, undefined, 0x000000, 0x000000, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0x000000, 0x000000, undefined, undefined, undefined],
+  [undefined, undefined, 0x000000, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0x000000, undefined, undefined],
+  [undefined, 0x000000, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0x000000, undefined],
+  [undefined, 0x000000, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0x000000, undefined],
+  [0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000],
+  [0x000000, 0xffff00, 0x000000, 0xffffff, 0xffffff, 0x000000, 0x000000, 0x000000, 0x000000, 0xffffff, 0xffffff, 0x000000, 0x000000, 0xffff00, 0x000000],
+  [0x000000, 0xffff00, 0x000000, 0xffffff, 0x000000, 0x000000, 0x000000, 0xffff00, 0x000000, 0xffffff, 0x000000, 0x000000, 0x000000, 0xffff00, 0x000000],
+  [0x000000, 0xffff00, 0xffff00, 0x000000, 0x000000, 0x000000, 0xffff00, 0xffff00, 0xffff00, 0x000000, 0x000000, 0x000000, 0xffff00, 0xffff00, 0x000000],
+  [0x000000, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0x000000],
+  [undefined, 0x000000, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0x000000, 0xffff00, 0xffff00, 0x000000, undefined],
+  [undefined, 0x000000, 0xffff00, 0xffff00, 0xffff00, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0xffff00, 0xffff00, 0xffff00, 0x000000, undefined],
+  [undefined, undefined, 0x000000, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0x000000, undefined, undefined],
+  [undefined, undefined, undefined, 0x000000, 0x000000, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0x000000, 0x000000, undefined, undefined, undefined],
+  [undefined, undefined, undefined, undefined, undefined, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, undefined, undefined, undefined, undefined, undefined]
 ]
 
 const screamBitmap: Color[][] = [
-  ['0', '0', '0', '0', '0', '0', 'D', 'D', 'D', 'D', 'D', 'D', '0', '0', '0', '0', '0', '0'],
-  ['0', '0', '0', '0', 'D', 'D', 'L', 'L', 'L', 'L', 'L', 'L', 'D', 'D', '0', '0', '0', '0'],
-  ['0', '0', '0', 'D', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'D', '0', '0', '0'],
-  ['0', '0', 'D', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'D', '0', '0'],
-  ['0', 'D', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'D', '0'],
-  ['0', 'D', 'L', 'L', 'B', 'B', 'B', 'L', 'L', 'L', 'L', 'B', 'B', 'B', 'L', 'L', 'D', '0'],
-  ['O', 'L', 'L', 'B', 'W', 'W', 'W', 'B', 'Y', 'Y', 'B', 'W', 'W', 'W', 'B', 'L', 'L', 'O'],
-  ['O', 'Y', 'B', 'W', 'W', 'W', 'W', 'B', 'Y', 'Y', 'B', 'W', 'W', 'W', 'W', 'B', 'Y', 'O'],
-  ['O', 'Y', 'B', 'W', 'W', 'W', 'B', 'Y', 'Y', 'Y', 'Y', 'B', 'W', 'W', 'W', 'B', 'Y', 'O'],
-  ['O', 'Y', 'B', 'W', 'W', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'W', 'W', 'B', 'Y', 'O'],
-  ['O', 'Y', 'Y', 'B', 'B', 'Y', 'Y', 'Y', 'B', 'B', 'Y', 'Y', 'Y', 'B', 'B', 'Y', 'Y', 'O'],
-  ['O', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'R', 'R', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'O'],
-  ['0', 'O', 'O', 'O', 'Y', 'Y', 'Y', 'B', 'R', 'R', 'B', 'Y', 'Y', 'Y', 'O', 'O', 'O', '0'],
-  ['0', 'O', 'Y', 'Y', 'O', 'Y', 'Y', 'B', 'R', 'R', 'B', 'Y', 'Y', 'O', 'Y', 'Y', 'O', '0'],
-  ['0', 'O', 'Y', 'Y', 'Y', 'O', 'Y', 'B', 'R', 'R', 'B', 'Y', 'O', 'Y', 'Y', 'Y', 'O', '0'],
-  ['0', '0', 'O', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'O', '0', '0'],
-  ['0', '0', '0', 'O', 'Y', 'Y', 'O', 'O', 'Y', 'Y', 'O', 'O', 'Y', 'Y', 'O', '0', '0', '0'],
-  ['0', '0', '0', 'O', 'Y', 'Y', 'O', '0', 'O', 'O', '0', 'O', 'Y', 'Y', 'O', '0', '0', '0']
+  [undefined, undefined, undefined, undefined, undefined, undefined, 0x4c71a2, 0x4c71a2, 0x4c71a2, 0x4c71a2, 0x4c71a2, 0x4c71a2, undefined, undefined, undefined, undefined, undefined, undefined],
+  [undefined, undefined, undefined, undefined, 0x4c71a2, 0x4c71a2, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x4c71a2, 0x4c71a2, undefined, undefined, undefined, undefined],
+  [undefined, undefined, undefined, 0x4c71a2, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x4c71a2, undefined, undefined, undefined],
+  [undefined, undefined, 0x4c71a2, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x4c71a2, undefined, undefined],
+  [undefined, 0x4c71a2, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x4c71a2, undefined],
+  [undefined, 0x4c71a2, 0x79afd9, 0x79afd9, 0x000000, 0x000000, 0x000000, 0x79afd9, 0x79afd9, 0x79afd9, 0x79afd9, 0x000000, 0x000000, 0x000000, 0x79afd9, 0x79afd9, 0x4c71a2, undefined],
+  [0xfe7d3e, 0x79afd9, 0x79afd9, 0x000000, 0xffffff, 0xffffff, 0xffffff, 0x000000, 0xffff00, 0xffff00, 0x000000, 0xffffff, 0xffffff, 0xffffff, 0x000000, 0x79afd9, 0x79afd9, 0xfe7d3e],
+  [0xfe7d3e, 0xffff00, 0x000000, 0xffffff, 0xffffff, 0xffffff, 0xffffff, 0x000000, 0xffff00, 0xffff00, 0x000000, 0xffffff, 0xffffff, 0xffffff, 0xffffff, 0x000000, 0xffff00, 0xfe7d3e],
+  [0xfe7d3e, 0xffff00, 0x000000, 0xffffff, 0xffffff, 0xffffff, 0x000000, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0x000000, 0xffffff, 0xffffff, 0xffffff, 0x000000, 0xffff00, 0xfe7d3e],
+  [0xfe7d3e, 0xffff00, 0x000000, 0xffffff, 0xffffff, 0x000000, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0x000000, 0xffffff, 0xffffff, 0x000000, 0xffff00, 0xfe7d3e],
+  [0xfe7d3e, 0xffff00, 0xffff00, 0x000000, 0x000000, 0xffff00, 0xffff00, 0xffff00, 0x000000, 0x000000, 0xffff00, 0xffff00, 0xffff00, 0x000000, 0x000000, 0xffff00, 0xffff00, 0xfe7d3e],
+  [0xfe7d3e, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0x000000, 0xbf2f36, 0xbf2f36, 0x000000, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xfe7d3e],
+  [undefined, 0xfe7d3e, 0xfe7d3e, 0xfe7d3e, 0xffff00, 0xffff00, 0xffff00, 0x000000, 0xbf2f36, 0xbf2f36, 0x000000, 0xffff00, 0xffff00, 0xffff00, 0xfe7d3e, 0xfe7d3e, 0xfe7d3e, undefined],
+  [undefined, 0xfe7d3e, 0xffff00, 0xffff00, 0xfe7d3e, 0xffff00, 0xffff00, 0x000000, 0xbf2f36, 0xbf2f36, 0x000000, 0xffff00, 0xffff00, 0xfe7d3e, 0xffff00, 0xffff00, 0xfe7d3e, undefined],
+  [undefined, 0xfe7d3e, 0xffff00, 0xffff00, 0xffff00, 0xfe7d3e, 0xffff00, 0x000000, 0xbf2f36, 0xbf2f36, 0x000000, 0xffff00, 0xfe7d3e, 0xffff00, 0xffff00, 0xffff00, 0xfe7d3e, undefined],
+  [undefined, undefined, 0xfe7d3e, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0x000000, 0x000000, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xfe7d3e, undefined, undefined],
+  [undefined, undefined, undefined, 0xfe7d3e, 0xffff00, 0xffff00, 0xfe7d3e, 0xfe7d3e, 0xffff00, 0xffff00, 0xfe7d3e, 0xfe7d3e, 0xffff00, 0xffff00, 0xfe7d3e, undefined, undefined, undefined],
+  [undefined, undefined, undefined, 0xfe7d3e, 0xffff00, 0xffff00, 0xfe7d3e, undefined, 0xfe7d3e, 0xfe7d3e, undefined, 0xfe7d3e, 0xffff00, 0xffff00, 0xfe7d3e, undefined, undefined, undefined]
 ]
 
 // Update the LED-panels
-export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontInstance>, panel: number, name: string, errCnt: number, heartbeatTimeout: boolean, showHeart: boolean, n: number): void => {
+export const drawState = ({ matrix, fonts, panel, name, errCnt, heartbeatTimeout, showHeart, n }: drawStateProps): void => {
   let bgColor = 0x000000
   let fgColor = 0xffffff
 
@@ -107,10 +97,10 @@ export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontI
     matrix.fgColor(hbBgColor)
     matrix.fill(0 + (panel * 32), 25, 32 + (panel * 32), 31)
     matrix.fgColor(hbFgColor)
-    matrix.drawText(name, xoffsetName, 26)
+    matrix.drawText(name.toLocaleUpperCase(), xoffsetName, 26)
   } else {
     matrix.fgColor(0xffffff)
-    matrix.drawText(name, xoffsetName, 26)
+    matrix.drawText(name.toLocaleUpperCase(), xoffsetName, 26)
   }
 
   // Background color
@@ -121,8 +111,8 @@ export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontI
     // Smiley
     for (let y = 0; y < smileyBitmap.length; y++) {
       for (let x = 0; x < smileyBitmap[y].length; x++) {
-        if (smileyBitmap[y][x] !== '0') {
-          matrix.fgColor(colorMap[smileyBitmap[y][x]])
+        if (smileyBitmap[y][x] !== undefined) {
+          matrix.fgColor(smileyBitmap[y][x] as number)
           matrix.setPixel((panel * 32) + x + 8, y + 6) // the '8' offset should be dynamic based on the bitmap
         }
       }
@@ -131,8 +121,8 @@ export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontI
     const bitmap = screamBitmap
     for (let y = 0; y < bitmap.length; y++) {
       for (let x = 0; x < bitmap[y].length; x++) {
-        if (bitmap[y][x] !== '0') {
-          matrix.fgColor(colorMap[bitmap[y][x]])
+        if (bitmap[y][x] !== undefined) {
+          matrix.fgColor(bitmap[y][x] as number)
           matrix.setPixel((panel * 32) + x + Math.floor(bitmap[y].length / 2) - 2, y + Math.floor(bitmap.length / 2) - 6) // the '8' offset should be dynamic based on the bitmap
         }
       }
