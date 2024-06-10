@@ -1,0 +1,28 @@
+# rsync (optional)
+apt install -y rsync
+systemctl enable rsync
+systemctl start rsync
+
+# git
+apt install -y git
+
+
+# node npm etc
+apt install -y build-essential nodejs npm
+
+
+# typescript
+npm install -g typescript
+npm install -g ts-node
+npm install -D tslib @types/node
+
+
+# nginx & certbot
+apt install -y nginx 
+
+# certbot (optional, default disabled)
+#apt install -y certbot python3-certbot-nginx
+#certbot --nginx --agree-tos --redirect --hsts --staple-ocsp --email you@example.com -d alertsquarer.tech.event.dreamhack.se
+
+# alertsquarer
+git clone "https://github.com/dhtech/alertsquarer.git"

@@ -1,12 +1,13 @@
 import fastify from 'fastify'
-import { wait } from './common'
+import { wait, setupLog } from './common'
 import { getFonts, getMatrix, drawState } from './libs/matrix'
 
-import { teams, defaultTTL, heartbeatTTL, updateMs, host, port } from './settings'
+import { teams, defaultTTL, heartbeatTTL, updateMs, host, port, debugOutputInterval, pruneInterval } from './settings'
 
 import type { IQueryString, IBody, Data, Alerts, Team } from './types'
 import type { LedMatrixInstance, FontInstance } from 'rpi-led-matrix'
 
+setupLog()
 
 // interface AlertData {
 //   type: 'alerts'
@@ -26,6 +27,9 @@ const data: Data = {
   heartbeatTS: 0
 }
 
+let lastDebugOutput = 0
+let lastPruneTS = 0
+
 //let heartbeatTimeout = false
 // let showHeart = false
 //let alertCount: Record<Team, number> = { core: 0, access: 0, services: 0 }
@@ -35,10 +39,8 @@ const countAlerts = (alerts: Alerts): Record<Team, number> => {
   const count = Object.keys(alerts).reduce((result: Record<Team, number>, key: string) => {
     const alert = alerts[key]
     result[alert.team] = (result[alert.team] ?? 0) + 1
-    console.log(key)
     return result
   }, { access: 0, core: 0, services: 0 }) // FIXME: This shouldn't be hardcoded
-  console.log(count)
 
   return count
 }
@@ -53,16 +55,15 @@ const pruneAlerts = (inData: Alerts): Alerts => {
     if (now - alert.timestamp < defaultTTL) {
       // keep the alert if it's younger than defaultTTL
       result[`${alert.team}:${alert.groupKey}`] = alert
-    } else {
-      //
-      console.log('removing', (now - alert.timestamp), alert)
-    }
+    } 
 
     return result
   }, {})
   const endCount = Object.keys(outData).length
 
-  console.log(`Pruned ${startCount - endCount} alerts.`)
+  if (startCount - endCount > 0) {
+    console.log(`Pruned ${startCount - endCount} alerts.`)
+  }
   return outData
 }
 
@@ -71,6 +72,7 @@ server.post('/api/v1/alerts', async (request, reply) => {
   const { groupKey, status } = request.body as IBody
 
   if (team === 'heartbeat') {
+    console.log("Recieved heartbeat")
     data.heartbeatTS = new Date().getTime()
     return { result: 'success', message: '<3' }
   } else if (!teams.includes(team)) {
@@ -78,6 +80,7 @@ server.post('/api/v1/alerts', async (request, reply) => {
     return { result: 'failed', message: `${team} is not a valid team.` }
   }
 
+  console.log(`Recieved error for ${team} (${groupKey})`)
   data.alerts[`${team}:${groupKey}`] = { team, groupKey, status, timestamp: new Date().getTime() }
 
   return { result: 'success', message: 'Sorry to hear, but noted.' }
@@ -135,16 +138,30 @@ const main = async (): Promise<void> => {
   // Load fonts, one small for the team name and one large for the number
   // of active alerts
   const fonts = getFonts()
-  
+
   let iterator = 0;
 
   while (true) {
-    data.alerts = pruneAlerts(data.alerts) // Remove old alerts
+    const now = new Date().getTime()
+
+    // remove old alerts periodically
+    if (now - lastPruneTS > pruneInterval) {
+      data.alerts = pruneAlerts(data.alerts) // Remove old alerts
+      lastPruneTS = now
+    }
+
     const alertCount = countAlerts(data.alerts) // Count alerts per team
     const heartbeatTimeout = (new Date().getTime() - data.heartbeatTS) > heartbeatTTL // Check if we have heartbeat
     const showHeart = ((new Date().getTime() - data.heartbeatTS) < 1000)
 
     updateMatrix(matrix, fonts, alertCount, heartbeatTimeout, showHeart, ++iterator)
+
+    // print some debug info to console
+    if (now - lastDebugOutput > debugOutputInterval) {
+      console.log(alertCount)
+      lastDebugOutput = now
+    }
+
     await wait(updateMs)
   }
 }
