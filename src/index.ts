@@ -1,11 +1,23 @@
 import fastify from 'fastify'
-import * as fs from 'fs'
-
 import { wait } from './common'
+import { getFonts, getMatrix, drawState } from './libs/matrix'
 
-import { teams, defaultTTL, heartbeatTTL, apiToMatrixSeconds, P_API_TO_MATRIX, host, port } from './settings'
+import { teams, defaultTTL, heartbeatTTL, updateMs, host, port } from './settings'
 
 import type { IQueryString, IBody, Data, Alerts, Team } from './types'
+import type { LedMatrixInstance, FontInstance } from 'rpi-led-matrix'
+
+
+// interface AlertData {
+//   type: 'alerts'
+//   ts: number
+//   count: Record<Team, number>
+//   heartbeatTimeout: boolean
+//   heartbeatTS: number
+// }
+
+type Fonts = Record<string, FontInstance>
+
 
 const server = fastify({})
 
@@ -13,6 +25,10 @@ const data: Data = {
   alerts: {},
   heartbeatTS: 0
 }
+
+//let heartbeatTimeout = false
+// let showHeart = false
+//let alertCount: Record<Team, number> = { core: 0, access: 0, services: 0 }
 
 // Create a dict with each team being the key and the value the number of active alerts.
 const countAlerts = (alerts: Alerts): Record<Team, number> => {
@@ -75,31 +91,61 @@ const serverCallback = (err: Error | null, addr: string): void => {
   }
 }
 
+
+// Parse raw data to fit the display controller
+/*
+export const parseData = (rawData: any):  => {
+  try {
+    const apiData = JSON.parse(rawData.toString()) as AlertData
+    const dataAge = new Date().getTime() - apiData.ts
+    if (dataAge > 10000) {
+      console.log(`Discarding data from server, too old ´(${dataAge})`)
+      return
+    }
+
+    // Update state
+    heartbeatTimeout = (apiData).heartbeatTimeout
+    alertCount = (apiData).count
+  } catch {
+    console.log('Exception when getting data')
+  }
+}
+*/ 
+const updateMatrix = (matrix: LedMatrixInstance, fonts: Fonts, alertCount: Record<string, number>, heartbeatTimeout: boolean, showHeart: boolean, n: number ): void => {
+
+  matrix.clear() // blank the (virtual) matrix
+
+  // For each team, draw the state of that teams count of active alerts
+  teams.forEach((team: Team, i: number) => {
+    const state = alertCount[team] ?? 0
+    drawState(matrix, fonts, i, team.toUpperCase(), state, heartbeatTimeout, showHeart, n)
+  })
+  matrix.sync() // Sync the matrix to the panels
+}
+
 // start webserver
 server.listen({ host, port }, serverCallback)
 
 // Main loop
 const main = async (): Promise<void> => {
-  while (!fs.existsSync(P_API_TO_MATRIX)) {
-    console.log('Waiting for MatrixCtrl to start...')
-    await wait(1000)
-  }
+
+  // Start matrix
+  const matrix = getMatrix()
+
+  // Load fonts, one small for the team name and one large for the number
+  // of active alerts
+  const fonts = getFonts()
+  
+  let iterator = 0;
 
   while (true) {
     data.alerts = pruneAlerts(data.alerts) // Remove old alerts
-    const count = countAlerts(data.alerts) // Count alerts per team
+    const alertCount = countAlerts(data.alerts) // Count alerts per team
     const heartbeatTimeout = (new Date().getTime() - data.heartbeatTS) > heartbeatTTL // Check if we have heartbeat
+    const showHeart = ((new Date().getTime() - data.heartbeatTS) < 1000)
 
-    const fifoWs = fs.createWriteStream(P_API_TO_MATRIX)
-    fifoWs.write(JSON.stringify({
-      type: 'alerts',
-      ts: new Date().getTime(),
-      count,
-      heartbeatTimeout,
-      heartbeatTS: data.heartbeatTS
-    }) + '\n')
-    fifoWs.close()
-    await wait(apiToMatrixSeconds * 1000)
+    updateMatrix(matrix, fonts, alertCount, heartbeatTimeout, showHeart, ++iterator)
+    await wait(updateMs)
   }
 }
 
