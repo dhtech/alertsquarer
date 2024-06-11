@@ -1,3 +1,6 @@
+import { FontInstance } from "rpi-led-matrix"
+
+export type Fonts = Record<string, FontInstance>
 
 export interface IQueryString {
   team: Team | 'heartbeat'

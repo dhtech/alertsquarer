@@ -22,21 +22,24 @@ const colorMap: Record<Color, number> = {
 }
 
 const smileyBitmap: Color[][] = [
-  ['0', '0', '0', '0', '0', 'B', 'B', 'B', 'B', 'B', '0', '0', '0', '0', '0'],
-  ['0', '0', '0', 'B', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'B', '0', '0', '0'],
-  ['0', '0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', '0', '0'],
-  ['0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', '0'],
-  ['0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', '0'],
-  ['B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B'],
-  ['B', 'Y', 'B', 'W', 'W', 'B', 'B', 'B', 'B', 'W', 'W', 'B', 'B', 'Y', 'B'],
-  ['B', 'Y', 'B', 'W', 'B', 'B', 'B', 'Y', 'B', 'W', 'B', 'B', 'B', 'Y', 'B'],
-  ['B', 'Y', 'Y', 'B', 'B', 'B', 'Y', 'Y', 'Y', 'B', 'B', 'B', 'Y', 'Y', 'B'],
-  ['B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B'],
-  ['0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'Y', 'Y', 'B', '0'],
-  ['0', 'B', 'Y', 'Y', 'Y', 'B', 'B', 'B', 'B', 'B', 'Y', 'Y', 'Y', 'B', '0'],
-  ['0', '0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', '0', '0'],
-  ['0', '0', '0', 'B', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'B', '0', '0', '0'],
-  ['0', '0', '0', '0', '0', 'B', 'B', 'B', 'B', 'B', '0', '0', '0', '0', '0']
+  ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+  ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+  ['0', '0', '0', '0', '0', '0', '0', 'B', 'B', 'B', 'B', 'B', '0', '0', '0', '0', '0', '0'],
+  ['0', '0', '0', '0', '0', 'B', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'B', '0', '0', '0', '0'],
+  ['0', '0', '0', '0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', '0', '0', '0'],
+  ['0', '0', '0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', '0', '0'],
+  ['0', '0', '0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', '0', '0'],
+  ['0', '0', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', '0'],
+  ['0', '0', 'B', 'Y', 'B', 'W', 'W', 'B', 'B', 'B', 'B', 'W', 'W', 'B', 'B', 'Y', 'B', '0'],
+  ['0', '0', 'B', 'Y', 'B', 'W', 'B', 'B', 'B', 'Y', 'B', 'W', 'B', 'B', 'B', 'Y', 'B', '0'],
+  ['0', '0', 'B', 'Y', 'Y', 'B', 'B', 'B', 'Y', 'Y', 'Y', 'B', 'B', 'B', 'Y', 'Y', 'B', '0'],
+  ['0', '0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', '0'],
+  ['0', '0', '0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'Y', 'Y', 'B', '0', '0'],
+  ['0', '0', '0', 'B', 'Y', 'Y', 'Y', 'B', 'B', 'B', 'B', 'B', 'Y', 'Y', 'Y', 'B', '0', '0'],
+  ['0', '0', '0', '0', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', '0', '0', '0'],
+  ['0', '0', '0', '0', '0', 'B', 'B', 'Y', 'Y', 'Y', 'Y', 'Y', 'B', 'B', '0', '0', '0', '0'],
+  ['0', '0', '0', '0', '0', '0', '0', 'B', 'B', 'B', 'B', 'B', '0', '0', '0', '0', '0', '0'],
+  ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
 ]
 
 const screamBitmap: Color[][] = [
@@ -119,11 +122,13 @@ export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontI
 
   if (errCnt === 0) {
     // Smiley
-    for (let y = 0; y < smileyBitmap.length; y++) {
-      for (let x = 0; x < smileyBitmap[y].length; x++) {
-        if (smileyBitmap[y][x] !== '0') {
-          matrix.fgColor(colorMap[smileyBitmap[y][x]])
-          matrix.setPixel((panel * 32) + x + 8, y + 6) // the '8' offset should be dynamic based on the bitmap
+    const bitmap = smileyBitmap
+    for (let y = 0; y < bitmap.length; y++) {
+      for (let x = 0; x < bitmap[y].length; x++) {
+        if (bitmap[y][x] !== '0') {
+          matrix.fgColor(colorMap[bitmap[y][x]])
+          // matrix.setPixel((panel * 32) + x + 8, y + 6) // the '8' offset should be dynamic based on the bitmap
+          matrix.setPixel((panel * 32) + x + Math.floor(bitmap[y].length / 2) - 2, y + Math.floor(bitmap.length / 2) - 6) 
         }
       }
     }
@@ -133,7 +138,7 @@ export const drawState = (matrix: LedMatrixInstance, fonts: Record<string, FontI
       for (let x = 0; x < bitmap[y].length; x++) {
         if (bitmap[y][x] !== '0') {
           matrix.fgColor(colorMap[bitmap[y][x]])
-          matrix.setPixel((panel * 32) + x + Math.floor(bitmap[y].length / 2) - 2, y + Math.floor(bitmap.length / 2) - 6) // the '8' offset should be dynamic based on the bitmap
+          matrix.setPixel((panel * 32) + x + Math.floor(bitmap[y].length / 2) - 2, y + Math.floor(bitmap.length / 2) - 6) 
         }
       }
     }
