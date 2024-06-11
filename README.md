@@ -33,7 +33,7 @@ echo "blacklist snd_bcm2835" > /etc/modprobe.d/no_rpi_sound.conf
 Autostart the service
 
 ```
-echo <<EOF >/etc/systemd/system/alertsquarer-api.service
+echo <<EOF >/etc/systemd/system/alertsquarer.service
 [Unit]
 Description=alertsquarer
 After=network.target
@@ -50,9 +50,10 @@ WorkingDirectory=/opt/alertsquarer
 [Install]
 WantedBy=multi-user.target
 EOF
+
 systemctl daemon-reload
-systemctl enable alertsquarer-api.service
-systemctl start alertsquarer-api.service
+systemctl enable alertsquarer.service
+systemctl start alertsquarer.service
 
 ```
 
