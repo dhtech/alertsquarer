@@ -1,4 +1,4 @@
-import { FontInstance } from "rpi-led-matrix"
+import { FontInstance, LedMatrixInstance } from "rpi-led-matrix"
 
 export type Fonts = Record<string, FontInstance>
 
@@ -23,4 +23,16 @@ export type Alerts = Record<string, Alert>
 export interface Data {
   alerts: Alerts
   heartbeatTS: number
+}
+
+
+export interface drawStateProps {
+  matrix: LedMatrixInstance
+  fonts: Record<string, FontInstance>
+  panel: number
+  name: string
+  errCnt: number
+  heartbeatTimeout: boolean
+  showHeart: boolean
+  iterator: number
 }
