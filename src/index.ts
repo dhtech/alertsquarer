@@ -7,7 +7,11 @@ import { teams, defaultTTL, heartbeatTTL, updateMs, host, port, debugOutputInter
 
 import type { IQueryString, IBody, Data, Alerts, Team } from './types'
 
-setupLog()
+const DEBUG = process.env.NODE_ENV === "dev"
+
+if (DEBUG) {
+  setupLog()
+}
 
 const server = fastify({})
 
@@ -57,7 +61,9 @@ server.post('/api/v1/alerts', async (request, reply) => {
   const { groupKey, status } = request.body as IBody
 
   if (team === 'heartbeat') {
-    console.log("Recieved heartbeat")
+    if (DEBUG) {
+      console.log("Recieved heartbeat")
+    }
     data.heartbeatTS = new Date().getTime()
     return { result: 'success', message: '<3' }
   } else if (!teams.includes(team)) {
@@ -65,7 +71,10 @@ server.post('/api/v1/alerts', async (request, reply) => {
     return { result: 'failed', message: `${team} is not a valid team.` }
   }
 
-  console.log(`Recieved error for ${team} (${groupKey})`)
+  if (DEBUG) {
+    console.log(`Recieved error for ${team} (${groupKey})`)
+  }
+  
   data.alerts[`${team}:${groupKey}`] = { team, groupKey, status, timestamp: new Date().getTime() }
 
   return { result: 'success', message: 'Sorry to hear, but noted.' }
@@ -94,6 +103,8 @@ const main = async (): Promise<void> => {
   let iterator = 0;
 
   while (true) {
+    iterator += 1
+
     const now = new Date().getTime()
 
     // remove old alerts periodically
@@ -108,14 +119,14 @@ const main = async (): Promise<void> => {
 
     matrix.clear() // blank the (virtual) matrix
     // For each team, draw the state of that teams count of active alerts
-    teams.forEach((team: Team, i: number) => {
-      const state = alertCount[team] ?? 0
-      drawState(matrix, fonts, i, team.toUpperCase(), state, heartbeatTimeout, showHeart, ++iterator)
+    teams.forEach((name: Team, panel: number) => {
+      const errCnt = alertCount[name] ?? 0
+      drawState({ matrix, fonts, panel, name, errCnt, heartbeatTimeout, showHeart, iterator })
     })
     matrix.sync() // Sync the matrix to the panels
 
     // print some debug info to console
-    if (now - lastDebugOutput > debugOutputInterval) {
+    if (DEBUG && now - lastDebugOutput > debugOutputInterval) {
       console.log(alertCount)
       lastDebugOutput = now
     }
