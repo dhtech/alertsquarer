@@ -29,7 +29,7 @@ const countAlerts = (alerts: Alerts): Record<Team, number> => {
     const alert = alerts[key]
     result[alert.team] = (result[alert.team] ?? 0) + 1
     return result
-  }, { access: 0, core: 0, services: 0 }) // FIXME: This shouldn't be hardcoded
+  }, { access: 0, core: 0, services: 0, observer: 0 }) // FIXME: This shouldn't be hardcoded
 
   return count
 }
@@ -66,7 +66,7 @@ server.post('/api/v1/alerts', async (request, reply) => {
     }
     data.heartbeatTS = new Date().getTime()
     return { result: 'success', message: '<3' }
-  } else if (!teams.includes(team)) {
+  } else if (!teams.includes(team as Team)) {
     console.error(`Unkown team ${team}.`)
     return { result: 'failed', message: `${team} is not a valid team.` }
   }
@@ -74,8 +74,17 @@ server.post('/api/v1/alerts', async (request, reply) => {
   if (DEBUG) {
     console.log(`Recieved error for ${team} (${groupKey})`)
   }
-  
-  data.alerts[`${team}:${groupKey}`] = { team, groupKey, status, timestamp: new Date().getTime() }
+
+  //  groupkey:
+  // '{}/{layer=~"^(?:dist|core|firewall)$"}:{alertname="RancidBackupTooOld", host="d-southwest-sw.event.dreamhack.se", instance="rancid.event.dreamhack.se:9100", layer="core"}'
+  let realTeam = (team === 'dist' ? 'core' : team) as Team
+
+  const observerMatch = groupKey.match(/instance="observer-nr.*event.dreamhack.se.+/)
+  if (realTeam === 'services' && observerMatch != null) { // special case to create alerts for observers
+    realTeam = 'observer'
+  }
+
+  data.alerts[`${realTeam}:${groupKey}`] = { team: realTeam, groupKey, status, timestamp: new Date().getTime() }
 
   return { result: 'success', message: 'Sorry to hear, but noted.' }
 })

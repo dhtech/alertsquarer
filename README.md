@@ -29,6 +29,11 @@ The matrix driver doesn't work *at all* when the module `snd_bcm2835` is loaded 
 echo "blacklist snd_bcm2835" > /etc/modprobe.d/no_rpi_sound.conf
 ```
 
+### Slightly improve display update
+```
+echo "isolcpus=3" >>  /boot/cmdline.txt
+```
+
 ### systemctl
 Autostart the service
 

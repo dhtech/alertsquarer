@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "rimraf ./build; mkdir ./build && tsc && cp src/*.bdf ./build/",
+    "build": "rimraf ./build; mkdir ./build && tsc && cp src/fonts/*.bdf ./build/",
     "dev": "cd src; NODE_ENV=dev ts-node ./index.ts",
     "start": "cd build; node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,6 +12,7 @@
   "author": "The Louie",
   "license": "ISC",
   "dependencies": {
+    "canvas": "^2.11.2",
     "fastify": "^4.18.0",
     "rpi-led-matrix": "^1.14.0"
   },

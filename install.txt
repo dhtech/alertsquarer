@@ -1,3 +1,7 @@
+# raspberry fixes
+echo "blacklist snd_bcm2835" > /etc/modprobe.d/no_rpi_sound.conf
+echo "isolcpus=3" >>  /boot/cmdline.txt
+
 # rsync (optional)
 apt install -y rsync
 systemctl enable rsync
@@ -6,10 +10,8 @@ systemctl start rsync
 # git
 apt install -y git
 
-
 # node npm etc
 apt install -y build-essential nodejs npm
-
 
 # typescript
 npm install -g typescript

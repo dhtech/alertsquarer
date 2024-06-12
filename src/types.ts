@@ -3,14 +3,14 @@ import { FontInstance, LedMatrixInstance } from "rpi-led-matrix"
 export type Fonts = Record<string, FontInstance>
 
 export interface IQueryString {
-  team: Team | 'heartbeat'
+  team: string
 }
 export interface IBody {
   groupKey: string
   status: string
 }
 
-export type Team = 'access' | 'core' | 'services'
+export type Team = 'access' | 'core' | 'services' | 'observer'
 
 export interface Alert {
   team: Team
