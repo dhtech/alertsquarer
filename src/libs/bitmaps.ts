@@ -9,6 +9,26 @@ export const heartBitmap = [
   
   type Color = number | undefined
   
+  export const xBitmap: Color[][] = [
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,],
+    [undefined,0xeeeeee,0xeeeeee,0xeeeeee,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,0xeeeeee,0xeeeeee,0xeeeeee,undefined,],
+    [undefined,0xeeeeee,0xff0000,0xff0000,0xeeeeee,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,0xeeeeee,0xff0000,0xff0000,0xeeeeee,undefined,],
+    [undefined,0xeeeeee,0xff0000,0xff0000,0xff0000,0xeeeeee,undefined,undefined,undefined,undefined,undefined,undefined,0xeeeeee,0xff0000,0xff0000,0xff0000,0xeeeeee,undefined,],
+    [undefined,undefined,0xeeeeee,0xff0000,0xff0000,0xff0000,0xeeeeee,undefined,undefined,undefined,undefined,0xeeeeee,0xff0000,0xff0000,0xff0000,0xeeeeee,undefined,undefined,],
+    [undefined,undefined,undefined,0xeeeeee,0xff0000,0xff0000,0xff0000,0xeeeeee,undefined,undefined,0xeeeeee,0xff0000,0xff0000,0xff0000,0xeeeeee,undefined,undefined,undefined,],
+    [undefined,undefined,undefined,undefined,0xeeeeee,0xff0000,0xff0000,0xff0000,0xeeeeee,0xeeeeee,0xff0000,0xff0000,0xff0000,0xeeeeee,undefined,undefined,undefined,undefined,],
+    [undefined,undefined,undefined,undefined,undefined,0xeeeeee,0xff0000,0xff0000,0xff0000,0xff0000,0xff0000,0xff0000,0xeeeeee,undefined,undefined,undefined,undefined,undefined,],
+    [undefined,undefined,undefined,undefined,undefined,undefined,0xeeeeee,0xff0000,0xff0000,0xff0000,0xff0000,0xeeeeee,undefined,undefined,undefined,undefined,undefined,undefined,],
+    [undefined,undefined,undefined,undefined,undefined,undefined,0xeeeeee,0xff0000,0xff0000,0xff0000,0xff0000,0xeeeeee,undefined,undefined,undefined,undefined,undefined,undefined,],
+    [undefined,undefined,undefined,undefined,undefined,0xeeeeee,0xff0000,0xff0000,0xff0000,0xff0000,0xff0000,0xff0000,0xeeeeee,undefined,undefined,undefined,undefined,undefined,],
+    [undefined,undefined,undefined,undefined,0xeeeeee,0xff0000,0xff0000,0xff0000,0xeeeeee,0xeeeeee,0xff0000,0xff0000,0xff0000,0xeeeeee,undefined,undefined,undefined,undefined,],
+    [undefined,undefined,undefined,0xeeeeee,0xff0000,0xff0000,0xff0000,0xeeeeee,undefined,undefined,0xeeeeee,0xff0000,0xff0000,0xff0000,0xeeeeee,undefined,undefined,undefined,],
+    [undefined,undefined,0xeeeeee,0xff0000,0xff0000,0xff0000,0xeeeeee,undefined,undefined,undefined,undefined,0xeeeeee,0xff0000,0xff0000,0xff0000,0xeeeeee,undefined,undefined,],
+    [undefined,0xeeeeee,0xff0000,0xff0000,0xff0000,0xeeeeee,undefined,undefined,undefined,undefined,undefined,undefined,0xeeeeee,0xff0000,0xff0000,0xff0000,0xeeeeee,undefined,],
+    [undefined,0xeeeeee,0xff0000,0xff0000,0xeeeeee,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,0xeeeeee,0xff0000,0xff0000,0xeeeeee,undefined,],
+    [undefined,0xeeeeee,0xeeeeee,0xeeeeee,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,0xeeeeee,0xeeeeee,0xeeeeee,undefined,],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,],
+  ]
   export const smileyBitmap: Color[][] = [
     [undefined, undefined, undefined, undefined, undefined, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, undefined, undefined, undefined, undefined, undefined],
     [undefined, undefined, undefined, 0x000000, 0x000000, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0xffff00, 0x000000, 0x000000, undefined, undefined, undefined],

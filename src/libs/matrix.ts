@@ -1,6 +1,6 @@
 import { Font, FontInstance, LedMatrix, LedMatrixInstance } from 'rpi-led-matrix'
 import type { drawStateProps } from '../types'
-import { heartBitmap, smileyBitmap, screamBitmap, } from './bitmaps'
+import { heartBitmap, smileyBitmap, screamBitmap, xBitmap} from './bitmaps'
 
 // Update the LED-panels
 export const drawState = ({ matrix, fonts, panel, name, errCnt, heartbeatTimeout, showHeart, iterator }: drawStateProps): void => {
@@ -49,7 +49,21 @@ export const drawState = ({ matrix, fonts, panel, name, errCnt, heartbeatTimeout
     matrix.fgColor(hbBgColor)
     matrix.fill(0 + (panel * 32), 25, 32 + (panel * 32), 31)
     matrix.fgColor(hbFgColor)
-    matrix.drawText(name.toLocaleUpperCase(), xoffsetName, 26)
+    //matrix.drawText(name.toLocaleUpperCase(), xoffsetName, 26)
+    if (iterator % 2 === 0) {
+      bgColor = 0xdddd00
+    } else {
+      bgColor = 0x000000
+    }
+
+    const panelText = [
+      "NO",
+      "HEART",
+      "BEAT",
+      ":("
+    ]
+    matrix.drawText(panelText[panel], (16 - ((panelText[panel].length * 4) / 2)) + (panel * 32), 26)
+
   } else {
     matrix.fgColor(0xffffff)
     matrix.drawText(name.toLocaleUpperCase(), xoffsetName, 26)
@@ -59,7 +73,17 @@ export const drawState = ({ matrix, fonts, panel, name, errCnt, heartbeatTimeout
   matrix.fgColor(bgColor)
   matrix.fill(0 + (panel * 32), 0, 32 + (panel * 32), 24)
 
-  if (errCnt === 0) {
+  if (heartbeatTimeout) {
+    const bitmap = xBitmap;
+    for (let y = 0; y < bitmap.length; y++) {
+      for (let x = 0; x < bitmap[y].length; x++) {
+        if (bitmap[y][x] !== undefined) {
+          matrix.fgColor(bitmap[y][x] as number)
+          matrix.setPixel((panel * 32) + x + Math.floor(bitmap[y].length / 2) - 2, y + Math.floor(bitmap.length / 2) - 6) // the '8' offset should be dynamic based on the bitmap
+        }
+      }
+    }
+  } else if (errCnt === 0) {
     // Smiley
     for (let y = 0; y < smileyBitmap.length; y++) {
       for (let x = 0; x < smileyBitmap[y].length; x++) {
