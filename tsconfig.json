@@ -30,7 +30,6 @@
     "target": "esnext"
   },
   "exclude": [
-    "node_modules",
-    "fakeMatrix.ts"
+    "node_modules"
   ]
 }

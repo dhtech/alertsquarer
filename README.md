@@ -14,7 +14,7 @@ git clone https://github.com/dhtech/alertsquarer.git
 cd alertsquarer
 npm install
 
-# to run via ts-node, start in sepatare terminal windows:
+# to run via ts-node, start in separate terminal windows:
 npm run dev
 
 # to build ts to js and run
@@ -38,7 +38,7 @@ echo "isolcpus=3" >>  /boot/cmdline.txt
 Autostart the service
 
 ```
-echo <<EOF >/etc/systemd/system/alertsquarer.service
+cat <<EOF >/etc/systemd/system/alertsquarer.service
 [Unit]
 Description=alertsquarer
 After=network.target

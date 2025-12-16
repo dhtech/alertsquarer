@@ -1,6 +1,15 @@
 import { Font, FontInstance, LedMatrix, LedMatrixInstance } from 'rpi-led-matrix'
 import type { drawStateProps } from '../types'
 import { heartBitmap, smileyBitmap, screamBitmap, xBitmap} from './bitmaps'
+import { chainLength, panelWidth, panelHeight, smallFontCharWidth } from '../settings'
+
+const getBitmapXOffset = (bitmapWidth: number, panel: number): number => {
+  return (panel * panelWidth) + Math.floor((panelWidth - bitmapWidth) / 2)
+}
+
+const getBitmapYOffset = (bitmapHeight: number, targetAreaHeight: number = 24): number => {
+  return Math.floor((targetAreaHeight - bitmapHeight) / 2)
+}
 
 // Update the LED-panels
 export const drawState = ({ matrix, fonts, panel, name, errCnt, heartbeatTimeout, showHeart, iterator }: drawStateProps): void => {
@@ -36,18 +45,18 @@ export const drawState = ({ matrix, fonts, panel, name, errCnt, heartbeatTimeout
   }
 
   const effErrCnt = (errCnt <= 99) ? `${errCnt}` : ':(' // If we have 100 or more errors, just show a sad face
-  const xoffsetErr = (effErrCnt.length === 1 ? 10 : 5) + (panel * 32)
+  const xoffsetErr = (effErrCnt.length === 1 ? 10 : 5) + (panel * panelWidth)
 
   // Team Text
   matrix.font(fonts.smallFont)
-  const xoffsetName = (16 - ((name.length * 4) / 2)) + (panel * 32)
+  const xoffsetName = (panelWidth / 2 - ((name.length * smallFontCharWidth) / 2)) + (panel * panelWidth)
 
   if (heartbeatTimeout) { // No heartbeat
     const hbFgColor = (iterator % 2 === 0) ? 0xffffff : 0x000000
     const hbBgColor = (iterator % 2 === 0) ? 0xaa0000 : 0xffff00
 
     matrix.fgColor(hbBgColor)
-    matrix.fill(0 + (panel * 32), 25, 32 + (panel * 32), 31)
+    matrix.fill(0 + (panel * panelWidth), 25, panelWidth + (panel * panelWidth), 31)
     matrix.fgColor(hbFgColor)
     //matrix.drawText(name.toLocaleUpperCase(), xoffsetName, 26)
     if (iterator % 2 === 0) {
@@ -62,7 +71,7 @@ export const drawState = ({ matrix, fonts, panel, name, errCnt, heartbeatTimeout
       "BEAT",
       ":("
     ]
-    matrix.drawText(panelText[panel], (16 - ((panelText[panel].length * 4) / 2)) + (panel * 32), 26)
+    matrix.drawText(panelText[panel], (panelWidth / 2 - ((panelText[panel].length * smallFontCharWidth) / 2)) + (panel * panelWidth), 26)
 
   } else {
     matrix.fgColor(0xffffff)
@@ -71,35 +80,47 @@ export const drawState = ({ matrix, fonts, panel, name, errCnt, heartbeatTimeout
 
   // Background color
   matrix.fgColor(bgColor)
-  matrix.fill(0 + (panel * 32), 0, 32 + (panel * 32), 24)
+  matrix.fill(0 + (panel * panelWidth), 0, panelWidth + (panel * panelWidth), 24)
 
   if (heartbeatTimeout) {
     const bitmap = xBitmap;
+    const bitmapWidth = bitmap[0]?.length ?? 0
+    const bitmapHeight = bitmap.length
+    const xOffset = getBitmapXOffset(bitmapWidth, panel)
+    const yOffset = getBitmapYOffset(bitmapHeight)
     for (let y = 0; y < bitmap.length; y++) {
       for (let x = 0; x < bitmap[y].length; x++) {
         if (bitmap[y][x] !== undefined) {
           matrix.fgColor(bitmap[y][x] as number)
-          matrix.setPixel((panel * 32) + x + Math.floor(bitmap[y].length / 2) - 2, y + Math.floor(bitmap.length / 2) - 6) // the '8' offset should be dynamic based on the bitmap
+          matrix.setPixel(xOffset + x, yOffset + y)
         }
       }
     }
   } else if (errCnt === 0) {
     // Smiley
+    const bitmapWidth = smileyBitmap[0]?.length ?? 0
+    const bitmapHeight = smileyBitmap.length
+    const xOffset = getBitmapXOffset(bitmapWidth, panel)
+    const yOffset = getBitmapYOffset(bitmapHeight)
     for (let y = 0; y < smileyBitmap.length; y++) {
       for (let x = 0; x < smileyBitmap[y].length; x++) {
         if (smileyBitmap[y][x] !== undefined) {
           matrix.fgColor(smileyBitmap[y][x] as number)
-          matrix.setPixel((panel * 32) + x + 8, y + 6) // the '8' offset should be dynamic based on the bitmap
+          matrix.setPixel(xOffset + x, yOffset + y)
         }
       }
     }
   } else if (errCnt > 5 && showHeart) {
     const bitmap = screamBitmap
+    const bitmapWidth = bitmap[0]?.length ?? 0
+    const bitmapHeight = bitmap.length
+    const xOffset = getBitmapXOffset(bitmapWidth, panel)
+    const yOffset = getBitmapYOffset(bitmapHeight)
     for (let y = 0; y < bitmap.length; y++) {
       for (let x = 0; x < bitmap[y].length; x++) {
         if (bitmap[y][x] !== undefined) {
           matrix.fgColor(bitmap[y][x] as number)
-          matrix.setPixel((panel * 32) + x + Math.floor(bitmap[y].length / 2) - 2, y + Math.floor(bitmap.length / 2) - 6) // the '8' offset should be dynamic based on the bitmap
+          matrix.setPixel(xOffset + x, yOffset + y)
         }
       }
     }
@@ -124,7 +145,7 @@ export const drawState = ({ matrix, fonts, panel, name, errCnt, heartbeatTimeout
 }
 
 export const getMatrix = (): LedMatrixInstance => new LedMatrix(
-  { ...LedMatrix.defaultMatrixOptions(), chainLength: 2, cols: 64, rows: 32 },
+  { ...LedMatrix.defaultMatrixOptions(), chainLength, cols: 64, rows: panelHeight },
   { ...LedMatrix.defaultRuntimeOptions(), doGpioInit: true, gpioSlowdown: 3 }
 )
 

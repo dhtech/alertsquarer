@@ -10,3 +10,8 @@ export const updateMs = 200        // Milliseconds
 
 export const debugOutputInterval = 2000
 export const pruneInterval = 5000
+
+export const chainLength = 2
+export const panelWidth = 32
+export const panelHeight = 32
+export const smallFontCharWidth = 4
