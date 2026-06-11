@@ -26,6 +26,10 @@ export interface Data {
 }
 
 
+export interface PanelImage {
+  pixels: Array<{ x: number, y: number, color: number }>
+}
+
 export interface drawStateProps {
   matrix: LedMatrixInstance
   fonts: Record<string, FontInstance>
@@ -35,4 +39,5 @@ export interface drawStateProps {
   heartbeatTimeout: boolean
   showHeart: boolean
   iterator: number
+  panelImage?: PanelImage
 }

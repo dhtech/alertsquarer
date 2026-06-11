@@ -1,6 +1,6 @@
 import fastify from 'fastify'
 import { wait, setupLog } from './common'
-import { getFonts, getMatrix, drawState } from './libs/matrix'
+import { getFonts, getMatrix, drawState, getImages } from './libs/matrix'
 
 import { teams, defaultTTL, heartbeatTTL, updateMs, host, port, debugOutputInterval, pruneInterval } from './settings'
 
@@ -154,6 +154,15 @@ const main = async (): Promise<void> => {
       process.exit(1)
     }
 
+    // Load any configured static PNG panels (decoded once, then reused)
+    let images: Awaited<ReturnType<typeof getImages>>
+    try {
+      images = await getImages()
+    } catch (error) {
+      console.error('Failed to load panel images:', error)
+      images = {}
+    }
+
     let iterator = 0;
 
     while (true) {
@@ -176,7 +185,7 @@ const main = async (): Promise<void> => {
         // For each team, draw the state of that teams count of active alerts
         teams.forEach((name: Team, panel: number) => {
           const errCnt = alertCount[name] ?? 0
-          drawState({ matrix, fonts, panel, name, errCnt, heartbeatTimeout: hasHeartbeatTimeout, showHeart, iterator })
+          drawState({ matrix, fonts, panel, name, errCnt, heartbeatTimeout: hasHeartbeatTimeout, showHeart, iterator, panelImage: images[name] })
         })
         matrix.sync() // Sync the matrix to the panels
 

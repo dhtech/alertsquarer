@@ -1,7 +1,42 @@
+import { createCanvas, loadImage } from 'canvas'
 import { Font, FontInstance, LedMatrix, LedMatrixInstance } from 'rpi-led-matrix'
-import type { drawStateProps } from '../types'
+import type { drawStateProps, PanelImage } from '../types'
 import { heartBitmap, smileyBitmap, screamBitmap, xBitmap} from './bitmaps'
-import { chainLength, panelWidth, panelHeight, smallFontCharWidth } from '../settings'
+import { chainLength, panelWidth, panelHeight, smallFontCharWidth, imagesDir, panelImages } from '../settings'
+
+// Decode each configured PNG once at startup into a flat list of lit pixels
+// (transparent pixels are dropped) so the render loop only does setPixel calls.
+export const getImages = async (): Promise<Partial<Record<string, PanelImage>>> => {
+  const result: Partial<Record<string, PanelImage>> = {}
+
+  for (const [team, file] of Object.entries(panelImages)) {
+    if (file === undefined) continue
+    try {
+      const img = await loadImage(`${imagesDir}/${file}`)
+      const canvas = createCanvas(panelWidth, panelHeight)
+      const ctx = canvas.getContext('2d')
+      ctx.clearRect(0, 0, panelWidth, panelHeight)
+      ctx.drawImage(img, 0, 0, panelWidth, panelHeight) // scale to fill the panel
+      const { data } = ctx.getImageData(0, 0, panelWidth, panelHeight)
+
+      const pixels: PanelImage['pixels'] = []
+      for (let y = 0; y < panelHeight; y++) {
+        for (let x = 0; x < panelWidth; x++) {
+          const i = (y * panelWidth + x) * 4
+          if (data[i + 3] < 128) continue // skip (mostly) transparent pixels
+          const color = (data[i] << 16) | (data[i + 1] << 8) | data[i + 2]
+          pixels.push({ x, y, color })
+        }
+      }
+      result[team] = { pixels }
+      console.log(`Loaded panel image for ${team}: ${file} (${pixels.length} px)`)
+    } catch (error) {
+      console.error(`Failed to load panel image for ${team} (${file}):`, error)
+    }
+  }
+
+  return result
+}
 
 const getBitmapXOffset = (bitmapWidth: number, panel: number): number => {
   return (panel * panelWidth) + Math.floor((panelWidth - bitmapWidth) / 2)
@@ -12,7 +47,18 @@ const getBitmapYOffset = (bitmapHeight: number, targetAreaHeight: number = 24): 
 }
 
 // Update the LED-panels
-export const drawState = ({ matrix, fonts, panel, name, errCnt, heartbeatTimeout, showHeart, iterator }: drawStateProps): void => {
+export const drawState = ({ matrix, fonts, panel, name, errCnt, heartbeatTimeout, showHeart, iterator, panelImage }: drawStateProps): void => {
+  // Static PNG panel: draw the image full-screen and skip all alert rendering.
+  // The matrix is cleared each loop, so dropped (transparent) pixels stay black.
+  if (panelImage !== undefined) {
+    const baseX = panel * panelWidth
+    for (const px of panelImage.pixels) {
+      matrix.fgColor(px.color)
+      matrix.setPixel(baseX + px.x, px.y)
+    }
+    return
+  }
+
   let bgColor = 0x000000
   let fgColor = 0xffffff
 
