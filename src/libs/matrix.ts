@@ -2,7 +2,7 @@ import { createCanvas, loadImage } from 'canvas'
 import { Font, FontInstance, LedMatrix, LedMatrixInstance } from 'rpi-led-matrix'
 import type { drawStateProps, PanelImage } from '../types'
 import { heartBitmap, smileyBitmap, screamBitmap, xBitmap} from './bitmaps'
-import { chainLength, panelWidth, panelHeight, smallFontCharWidth, imagesDir, panelImages } from '../settings'
+import { chainLength, panelWidth, panelHeight, smallFontCharWidth, imagesDir, panelImages, gpioSlowdown, pwmLsbNanoseconds, pwmBits, pwmDitherBits } from '../settings'
 
 // Decode each configured PNG once at startup into a flat list of lit pixels
 // (transparent pixels are dropped) so the render loop only does setPixel calls.
@@ -191,8 +191,8 @@ export const drawState = ({ matrix, fonts, panel, name, errCnt, heartbeatTimeout
 }
 
 export const getMatrix = (): LedMatrixInstance => new LedMatrix(
-  { ...LedMatrix.defaultMatrixOptions(), chainLength, cols: 64, rows: panelHeight },
-  { ...LedMatrix.defaultRuntimeOptions(), doGpioInit: true, gpioSlowdown: 3 }
+  { ...LedMatrix.defaultMatrixOptions(), chainLength, cols: 64, rows: panelHeight, pwmLsbNanoseconds, pwmBits, pwmDitherBits },
+  { ...LedMatrix.defaultRuntimeOptions(), doGpioInit: true, gpioSlowdown }
 )
 
 export const getFonts = (): Record<string, FontInstance> => ({
