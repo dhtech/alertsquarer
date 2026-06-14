@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "rimraf ./build; mkdir ./build && tsc && cp src/fonts/*.bdf ./build/ && cp -r src/images ./build/",
+    "build": "rimraf ./build; mkdir ./build && tsc && cp -r src/fonts ./build/ && cp -r src/images ./build/",
     "dev": "cd src; NODE_ENV=dev ts-node ./index.ts",
     "start": "cd build; node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"

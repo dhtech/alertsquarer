@@ -28,15 +28,31 @@ export const gpioSlowdown = 3
 //   3. Watch the refresh rate (run with --led-show-refresh); higher ns = lower
 //      refresh, so stop at the lowest value that removes the bleeding.
 //   4. Still bleeding at ~300? Lower pwmBits to 7 (below) before going higher.
-export const pwmLsbNanoseconds = 200  // default 130; higher = less ghosting
+export const pwmLsbNanoseconds = 130  // default 130; on THIS panel raising it made bleed worse, so left at default
+export const brightness = 100         // 0-100; lower = less drive/current. Try 50 — if bleed scales with brightness it's drive/power related
 export const pwmBits = 7              // default 11; lower = less ghosting, fine for text
 export const pwmDitherBits = 1        // recover perceived quality after lowering pwmBits
+
+// Refresh-rate diagnostics / tuning.
+// Print the achieved refresh rate to stderr (dev only; it's noisy). Compare the
+// Hz when the Pi is idle vs under load (e.g. during a build) — if idle shows a
+// much higher Hz, an unthrottled refresh rate is the likely cause of the bleeding.
+export const showRefreshRate = process.env.NODE_ENV === 'dev'
+// Cap the panel refresh rate (Hz). 0 = unlimited. If bleeding is worse at idle
+// (refresh runs flat-out) and better under load, capping here emulates the
+// "under load" condition permanently. Start around 100 and raise until it flickers.
+export const limitRefreshRateHz = 0  // refresh rate ruled out as a bleed cause
 
 // Static PNG panels.
 // Directory (relative to the process cwd) that PNG files are read from.
 // In dev the cwd is ./src, in prod it is ./build — `cp -r src/images ./build/`
 // in the build script keeps both in sync.
 export const imagesDir = './images'
+
+// Directory (relative to the process cwd) that .bdf fonts are read from. Same
+// dev/prod story as imagesDir: cwd is ./src in dev and ./build in prod, and the
+// build script does `cp -r src/fonts ./build/` to keep both resolving './fonts'.
+export const fontsDir = './fonts'
 
 // Map a team to a PNG filename inside `imagesDir`. Any team listed here shows
 // the image full-screen (32x32) instead of its alert count / name. Drop the
